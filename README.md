@@ -31,22 +31,19 @@ Subject project is a group work project (Maximum 3 students per group). Each gro
     h. Results and conclusions. 
     i. References. 
     j. Appendix: includes  all  the  items  that  you  could  not  cover  in  the  report  where they need extra explanations. 
+    
 2. **A  midterm  progress  report  on  the  subject  project  should  be  submitted  in  class  on  September 30, 2024.** This report includes the progress that is completed by the group in the  project  until  the  submission  date.  The  progress  report  will  cover,  at  least,  the  following: introduction, literature review, equipment and steps description using photos or any other means, factors that affect productivity, and data collection  procedure of the selected project. The format of this progress report follows the above items from a to j in point 1. 
 3. Each  group  has  to  present  what  they  did  in  the  project  on  2024/11/18  in  class.  There  are three tasks for each group to present: literature review and construction process, data collection  procedure  and  simulation  procedure,  and  productivity  analysis.  Each  group  member has to present one task. 
 4. A peer-evaluation form will be posted on our website for each group member to evaluate his/her partners’ performance in the project. It should be submitted to the instructor on 2024/11/18. 
 5. Each  student  will  be  evaluated  according  to  project  report,  presentation,  and  peerevaluation.  If a  group  selects  one  presenter,  each  individual  inside  this  group  is  going to have same grade as the presenter in the presentation part. 
 
-  
- 
- 
-Evaluation  Report  Criteria  
-No. Criteria Weight 
-1 Report Format 2 
-2 Literature 4 
-3 Data Collection 4 
-4 Methodology (Similar to class problems vs. creative idea) 6 
-5 Results and Analysis 2 
-6 Conclusions  and  References 2 
+## 评分细则
+1. Report Format 2 
+2. Literature 4 
+3. Data Collection 4 
+4. Methodology (Similar to class problems vs. creative idea) 6 
+5. Results and Analysis 2 
+6. Conclusions  and  References 2 
  
 
 ## Information
