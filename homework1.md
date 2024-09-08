@@ -1,19 +1,36 @@
 # Homework 1
 
 ## Think about an operation in your domain.
-Large Geothermal Heat Pump Installation
-Tasks in the operation
-1. Excavation of trenches (for horizontal loops) or boreholes for
-(vertical ducts)
-2. Placement of loops or ducts
-3. Core drilling through foundation
-4. Connect loops or ducts to manifold
-5. Connect duct work, manifold, optional water heater to heat
-pump
-6. Connect thermostat cables and control cables to heat pump
-7. Supply fresh water
-## List all the tasks in this operation.
 
-## List the resources required in the tasks/operation.
+Urban Transportation (considering Bus and Metro systems, as they have defined stations and routes.)
 
-## Draw the number of cycles in each operation.
+## List all the tasks in this operation:
+1. Walk to a station.
+2. Wait for a specific vehicle (Bus or Metro).
+3. Board the vehicle.
+4. Wait while the vehicle moves.
+5. Get off at the destination station.
+
+## List the resources required in the tasks/operation:
+People (can be categorized by their destinations).
+
+## Draw the number of cycles in each operation:
+For example, in a two-cycle system where a person travels from a bus station to a metro station, you can break down the process as follows:
+
+- First cycle: 
+    1. Bus journey
+    2. Walk to the bus station.
+    3. Wait for the bus.
+    4. Board the bus.
+    5. Wait for the bus to move.
+    6. Get off at the metro station.
+
+- Second cycle: 
+    1. Metro journey
+    2. Walk to the metro station.
+    3. Wait for the metro.
+    4. Board the metro.
+    5. Wait for the metro to move.
+    6. Get off at the destination.
+
+In this system, the process from one station to another involves two cycles, one for the bus and one for the metro, with each cycle repeating a similar set of tasks.
