@@ -11,9 +11,18 @@
 2. What are the different simulation packages available for construction?
    - WebCYCLONE,STROBOSCOPE,EzStrobe,ANYLOGIC
 3. List different types of models.
-   - 
+   - Static model: site layout diagram.
+   - Dynamic model: action of a pile driving hammer.
+   - Deterministic model: all times are constants.
+   - Stochastic model: all times are random (variable).
+   - Discrete event model: time advances in uneven steps.
+   - Continuous event model: time advances in uniform steps.
 4. What are the MicroCYCLONE elements for graphical representation? List their functions.
-   - 
+   - NORMAL
+   - COMBInation
+   - QUEue
+   - COUNTER
+   - ARC
 5. Model earth moving simulation using MicroCYCLONE.
    - 
 6. Model the construction of a new faculty in the Z Block bridge using MicroCYCLONE.
@@ -21,7 +30,7 @@
 7. Model a construction operation (i.e. trenchless techniques, tunneling, slip forming, bridge construction, piling, platforms, etc) using MicroCYCLONE.
    - 
 8. Explain the major simulation concepts. 
-   - 
+   - Simulation is a preplanning technique which can be used to preplan any cyclic construction operation before construction begins or at the beginning of the operation.
 9.  Do hand simulation for a masonry operation with 4 masons and 2 helpers.
    - 
 10. Simulate the masonry problem using a MicroCYCLONE program. Get reports.
