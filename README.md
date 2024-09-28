@@ -19,7 +19,7 @@ Subject project is a group work project (Maximum 3 students per group). Each gro
  
 ### Some guidelines for this project: 
 1. Each group is going to submit one final report on Monday - 2024/11/18, before 8:00am to a drop box drive or any other means that will be provided on time. This report includes: 
-    a. A cover page that includes group names, project process name, class project  title, suggested executer name and logo, etc. 
+    a. A cover page that includes group names, project process name, class project title, suggested executer name and logo, etc. 
     b. A  cover  letter  to  the  executer’s  technical  office  showing  that  you  did  study  the  
     intended process. You are acting as a part of the technical office team  submitting a progress report to your boss about the selected process. 
     c. Spread sheets that show all calculations and associated sketches, if necessary. 
