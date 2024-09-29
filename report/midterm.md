@@ -1,11 +1,5 @@
 # midterm  progress  report
-
-- **Group Name:** Mr. Li and Mr. Pan's Group
-- **Project Process Name:** Fire Spread Simulation
-- **Class Project Title:** Wildfire Spread Forecasting in Wildland-Urban Interface (WUI) Zones
-- **Suggested Executer Name:** Yizhou Li, Zhiqing Pan
-
-<div STYLE="page-break-after: always;"></div>
+> ZhiqingPAN24037665g
 
 ## Introduction
 Fire has been a long-existent phenomenon on Earth and an essential part of different ecosystems (Running 2006; Belcher 2013). With the rise of human civilization and the expansion of living space, humans are gradually occupying the wildlands to create more urban areas. Meanwhile, our human activities have caused more and more wildfires and increased the frequency of extreme wildfires. Once a wildfire occurs, it primarily affects the residents who live in the emerging wildland-urban interface (WUI) (Theobald and Romme 2007; Gill and Stephens 2009). 
@@ -47,23 +41,42 @@ At each time step, we can calculate the direction and speed of the flame spread 
 
 
 ## Factors that Affect Productivity
-1. **Fuel Type and Moisture Content**: The type of fuel and its moisture content significantly affect the spread of wildfires. Dry fuels burn more easily and quickly than wet fuels. The moisture content of the fuel can be influenced by weather conditions such as rainfall and humidity.
-2. **Topography**: The slope and aspect of the terrain can affect the spread of wildfires. Steep slopes can cause fires to spread more rapidly, while flat terrain may slow down the fire's progress. The aspect of the terrain can also influence the direction in which the fire spreads.
-3. **Weather Conditions**: Wind speed and direction, temperature, and humidity can all impact the spread of wildfires. Strong winds can cause fires to spread more quickly, while high temperatures and low humidity can increase the likelihood of fires starting and spreading.
-4. **Vegetation Density**: The density of vegetation in an area can affect the spread of wildfires. Dense vegetation can provide more fuel for the fire to burn, while sparse vegetation may slow down the fire's progress.
-5. **Firefighting Efforts**: The effectiveness of firefighting efforts can also impact the spread of wildfires. Prompt and well-coordinated firefighting efforts can help contain fires and prevent them from spreading further.
+
+正如我们上文提到的，野火燃烧过程是一个复杂的动态过程，并且我们已经就单一格网构建了简易的燃烧模型。从静态角度考虑，当前格网的燃烧潜力至少受到以下因素的影响：
+1. 地表可燃物储量: 主要包括植被类型、植被密度、植被高度、植被湿度等。该部分决定了燃烧模型的初始条件(燃料量及品质),是首先需要调查并建模的部分。
+2. 地形: 主要包括坡度、坡向、海拔等。对于同一植被类型，不同地形条件下的燃烧速度和方向可能会有很大差异,尤其是在山区。
+
+从燃烧过程的动态角度考虑：
+1. 气象条件: 主要包括风速、风向、温度等。这些因素会在燃烧的过程中不断影响火势的传播速度和方向。从模拟算法的角度讲,在 "burning with changed outer conditions" 这一步骤中,模型会不断接受外界参数并不断,更新当前格网的燃烧程度,直到当前格网完全熄灭。在格网间传播火势时,会根据外界参数计算传播概率,并根据概率控制火势的传播。
+2. 火灾扑救措施: 主要包括扑救人员,扑救设备辆等。对于动态的扑救行为,我们可以建立新的循环;对于隔离带等静态设施,则可以作为地形的一部分,在模拟中动态更新。
+
+As mentioned above, the wildfire burning process is a complex dynamic process, and we have built a simple burning model cycle for a single grid. From a static perspective, the burning potential of the current grid is at least affected by the following factors:
+1. Surface combustible reserves: mainly including vegetation type, vegetation density, vegetation height, vegetation humidity, etc. This part determines the initial conditions of the burning model (fuel quantity and quality) and is the first part that needs to be investigated and modeled.
+2. Terrain: mainly including slope, aspect, altitude, etc. For the same vegetation type, the burning speed and direction under different terrain conditions may vary greatly, especially in mountainous areas.
+
+From the dynamic perspective of the burning process:
+1. Meteorological conditions: mainly including wind speed, wind direction, temperature, etc. These factors will continuously affect the spread speed and direction of the fire during the burning process. From the perspective of the simulation algorithm, in the "burning with changed outer conditions" step, the model will continuously accept external parameters and continuously update the burning degree of the current grid until the current grid is completely extinguished. When spreading the fire between grids, the spread probability will be calculated based on external parameters and burning grids spacial pattern, and the spread of the fire will be controlled based on this probability.
+3. Firefighting measures: mainly including firefighting personnel, firefighting equipment, etc. For dynamic firefighting actions, we can establish a new loop; for static facilities such as firebreaks, they can be part of the terrain and dynamically updated in the simulation.
 
 ## Data Collection Procedure of the Selected Project
-1. 地形数据：从香港政府的开源数据网站直接下载研究区域的地形数据，随后使用ArcGIS 10.2软件对这些数据进行后处理，得到精度为5米的地形数据。地形数据包括高程、坡度和坡向等信息，这些信息将用于模拟火灾蔓延过程中的地形条件。
-2. 气象数据：我们将使用香港气象局的气象数据，包括风速、风向、温度和湿度等信息。这些数据将用于模拟火灾蔓延过程中的气象条件。
-3. 燃料数据：我们将使用香港政府的植被数据来确定研究区域的植被类型和密度。这些数据将用于定制燃料模型，以便更准确地模拟火灾蔓延过程。
-4. 火灾历史数据：我们将使用香港消防处的火灾历史数据来确定岛屿上的火灾发生频率和规模。这些数据将用于评估火灾风险和制定应急响应计划。
+从 GIS 数据采集角度讲, 我们已经或正在收集的数据主要包括:
+1. 火灾历史数据: 我们将首先使用香港消防处的火灾历史数据来确定香港地区总体野火火灾的频率和规模,并结合这些信息筛选潜在的研究区域。
+2. 研究区域的植被数据: 我们认为某一区域的植被是野火的主要燃料,所以植被的种类,密度,高度,湿度等信息是重要的初始条件。我们综合使用遥感图像(尤其是近红外波段),香港政府的植被数据等,来获取研究区域的植被信息,并通过 GIS 手段将其转化为分辨率为5米的燃料栅格数据。
+3. 研究区域的气象数据: 我们下载了香港气象局的气象数据近一年的气象数据,并对研究区域的温度,湿度,风速,风向等信息进行了统计分析,获取各个气象参数的概率分布,以用于蒙特卡洛模拟并获得合适时间步的气象模拟数据。
+4. 研究区域的地形数据: 从香港政府的开源数据网站直接下载研究区域的地形数据,随后使用 ArcGIS 10.2 软件对这些数据进行后处理,得到精度为5米的地形数据。地形数据包括高程,坡度和坡向等信息,这些信息将用于模拟火灾蔓延过程中的地形条件。
+
+From the perspective of GIS data collection, the data we have collected or are collecting mainly include:
+1. Fire History Data: We will first use the fire history data from the Hong Kong Fire Services Department to determine the frequency and scale of wildfires in the Hong Kong area and select potential study areas based on this information.
+2. Vegetation Data of the Study Area: We consider the vegetation in a region to be the primary fuel for wildfires, so information such as vegetation type, density, height, and humidity is important initial conditions. We use remote sensing images (especially near-infrared bands), vegetation data from the Hong Kong government, etc., to obtain vegetation information in the study area and convert it into fuel grid data with a resolution of 5 meters using GIS methods.
+3. Meteorological Data of the Study Area: We downloaded meteorological data from the Hong Kong Observatory for the past year and performed statistical analysis on the temperature, humidity, wind speed, wind direction, etc., in the study area to obtain the probability distribution of each meteorological parameter for use in Monte Carlo simulations and obtain suitable time-step meteorological simulation data.
+4. Topographic Data of the Study Area: Download topographic data of the study area directly from the Hong Kong government's open data website, and then post-process these data using ArcGIS 10.2 software to obtain topographic data with an accuracy of 5 meters. Topographic data includes elevation, slope, and aspect information, which will be used to simulate the terrain conditions during the wildfire spread process.
 
 ![](./imgs/f2.png)
-1. **Topographic Data**: Download topographic data of the study area directly from the Hong Kong government's open data website, and then post-process these data using ArcGIS 10.2 software to obtain topographic data with an accuracy of 5 meters. Topographic data includes elevation, slope, and aspect information, which will be used to simulate the terrain conditions during the wildfire spread process.
-2. **Meteorological Data**: We will use meteorological data from the Hong Kong Observatory, including wind speed, wind direction, temperature, and humidity information. This data will be used to simulate the meteorological conditions during the wildfire spread process.
-3. **Fuel Data**: We will use vegetation data from the Hong Kong government to determine the vegetation types and densities in the study area. This data will be used to customize the fuel model to more accurately simulate the wildfire spread process.
-4. **Fire History Data**: We will use fire history data from the Hong Kong Fire Services Department to determine the frequency and scale of fires on the island. This data will be used to assess fire risk and develop emergency response plans.
+
+Topographic Data: Download topographic data of the study area directly from the Hong Kong government's open data website, and then post-process these data using ArcGIS 10.2 software to obtain topographic data with an accuracy of 5 meters. Topographic data includes elevation, slope, and aspect information, which will be used to simulate the terrain conditions during the wildfire spread process. 
+Meteorological Data: We will use meteorological data from the Hong Kong Observatory, including wind speed, wind direction, temperature, and humidity information. This data will be used to simulate the meteorological conditions during the wildfire spread process.
+Fuel Data: Vegetation data from the Hong Kong government to determine the vegetation types and densities in the study area. This data will be used to customize the fuel model to more accurately simulate the wildfire spread process.
+Fire History Data: Fire history data from the Hong Kong Fire Services Department to determine the frequency and scale of fires on the island. This data will be used to assess fire risk and develop emergency response plans.
 
 
 ## References
