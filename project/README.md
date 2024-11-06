@@ -27,6 +27,9 @@
 - https://nomads.ncep.noaa.gov
 - https://nomads.ncep.noaa.gov/dods/
 
+## Data Source Solar
+https://tweakpane.github.io/docs/
+
 该代码主要用于从GFS（Global Forecast System）模型中获取并处理气象数据，包括**风**和**太阳辐射（solar）**，然后通过`react-query`缓存数据，以便在页面中轻松访问这些数据。以下是代码的详细解析：
 ```ts
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
