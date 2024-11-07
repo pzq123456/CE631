@@ -36,7 +36,7 @@ const renderer = new Renderer(canvas.getLayer('game'), grid);
 
 const controller = new Controller(canvas.getLayer('control'), grid);
 
-grid.test();
+// grid.test();
 function update(){
     renderer.update();
 }

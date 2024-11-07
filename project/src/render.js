@@ -30,9 +30,11 @@ export class Renderer{
         const { rows, cols } = this.grid.SIZE;
         const { width, height } = this.cellSize;
 
+        const grid = this.grid;
+
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                const value = this.grid.data[row][col];
+                const value = grid.data[row][col];
                 const color = this.grid.stastics.mvc(value, this.Colors);
 
                 this.ctx.fillStyle = color;

@@ -59,7 +59,7 @@ export class Controller {
         this.#mousePosition.col = col;
 
         // 打印鼠标位置和网格行列信息
-        console.log(`Mouse Position - x: ${x}, y: ${y}, Grid - row: ${row}, col: ${col}`);
+        // console.log(`Mouse Position - x: ${x}, y: ${y}, Grid - row: ${row}, col: ${col}`);
     }
 
     /**
@@ -80,8 +80,11 @@ export class Controller {
      * @param {Number} col - 网格列号
      */
     #updateGridData(row, col) {
-        // 例如：在被点击的网格中设置一个值
-        this.#grid.data[row][col] = Math.random() * 100;
+        // // 例如：在被点击的网格中设置一个值
+        // this.#grid.data[row][col] = Math.random() * 100;
+        // console.log(`Grid data updated at row: ${row}, col: ${col}`);
+
+        this.#grid.setCell(row, col, Math.random() * 100);
         console.log(`Grid data updated at row: ${row}, col: ${col}`);
     }
 
@@ -92,8 +95,11 @@ export class Controller {
      * @returns {Boolean}
      */
     #isValidGridPosition(row, col) {
-        return row >= 0 && row < this.#grid.data.length &&
-               col >= 0 && col < this.#grid.data[0].length;
+        // return row >= 0 && row < this.#grid.data.length &&
+        //        col >= 0 && col < this.#grid.data[0].length;
+
+        const { rows, cols } = this.#grid.SIZE;
+        return row >= 0 && row < rows && col >= 0 && col < cols;
     }
 
     /**

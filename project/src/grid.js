@@ -10,13 +10,16 @@ import { Stastics } from "./stastics.js";
  */
 
 export class Grid {
+    #data; // 私有属性
+
     constructor(rows,cols){
         this.rows = rows;
         this.cols = cols;
         // this.data = create2DArray(rows,cols);
-        this.data = createRandom2DArray(rows,cols);
+        this.#data = createRandom2DArray(rows,cols);
         this.stastics = new Stastics();
-        this.stastics.append2DArr(this.data);
+        // this.stastics.append2DArr(this.data);
+        this.updateStastics();
     }
 
     get SIZE(){
@@ -26,9 +29,19 @@ export class Grid {
         };
     }
 
-    test(){
-        console.log(this.data);
-        console.log(this.stastics.desciption);
+    // 修改某一位置的值
+    setCell(x,y,value){
+        this.#data[x][y] = value;
+        this.updateStastics();
+    }
+
+    updateStastics(){
+        this.stastics.clear();
+        this.stastics.append2DArr(this.#data);
+    }
+
+    get data(){
+        return this.#data;
     }
 }
 
