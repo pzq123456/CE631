@@ -7,6 +7,12 @@
  */
 import { uuid } from './utils.js';
 
+/**
+ * usage:
+ * ```js
+ * let canvas = new Canvas(document.body, ["game", "text", "control"], 1024, 512, 0);
+ * ```
+ */
 export class Canvas{
     #uuid;
     #width;
@@ -86,7 +92,6 @@ export class Canvas{
             zIndex: this.zIndexFrom,
             backgroundColor: '#ACD3DF',
             // backgroundColor: 'black',
-
         }
 
         for(let key in style){

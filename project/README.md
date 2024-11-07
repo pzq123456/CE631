@@ -29,6 +29,8 @@
 
 ## Data Source Solar
 https://tweakpane.github.io/docs/
+https://www.worldatlas.org
+https://observablehq.com/@d3/gallery?utm_source=d3js-org&utm_medium=page-nav&utm_campaign=try-observable
 
 该代码主要用于从GFS（Global Forecast System）模型中获取并处理气象数据，包括**风**和**太阳辐射（solar）**，然后通过`react-query`缓存数据，以便在页面中轻松访问这些数据。以下是代码的详细解析：
 ```ts
@@ -212,3 +214,4 @@ export const useGetSolar = (options?: Omit<UseWeatherQueryOptions, 'type'>) =>
 
 ### 小结
 代码逻辑巧妙地结合了时间步计算、数据请求和插值处理，确保能实时、准确地获取气象数据，同时通过`react-query`实现了自动缓存和更新。
+

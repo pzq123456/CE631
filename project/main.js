@@ -1,35 +1,51 @@
 import {Pane} from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/dist/tweakpane.min.js';
+import { Canvas } from './src/canvas.js';
 
-const panel = document.getElementsByClassName('panel')[0];
+import { Grid } from './src/grid.js';
+
+import { interpolateColors } from './src/colors.js';
+
+import { Renderer } from './src/render.js';
+
+import { Controller } from './src/control.js';
+
+const myCanvas = document.getElementById('myCanvas');
+
+const canvas = new Canvas(myCanvas, ["game", "text", "control"], 1024, 1024, 0);
 
 const PARAMS = {
-    fontSize: 16,
-    title: 'hello',
-    color: '#ff0055',
+    color1: '#ff0055',
+    color2: '#00ff55',
 };
 
 const pane = new Pane();
 
-pane.addBinding(PARAMS, 'fontSize', {
-    min: 10,
-    max: 100,
-});
+pane.addBinding(PARAMS, 'color1');
+pane.addBinding(PARAMS, 'color2');
 
-pane.addBinding(PARAMS, 'title');
-pane.addBinding(PARAMS, 'color');
-
-// 以绑定的值创建一个 h1 元素
-const h1 = document.createElement('h1');
-h1.textContent = PARAMS.title;
-h1.style.color = PARAMS.color;
-h1.style.fontSize = `${PARAMS.fontSize}px`;
-document.body.appendChild(h1);
-
-function update() {
-    h1.style.fontSize = `${PARAMS.fontSize}px`;
-    h1.textContent = PARAMS.title;
-    h1.style.color = PARAMS.color;
+function PaneUpdate() {
+    const colors = interpolateColors(PARAMS.color1, PARAMS.color2, 100);
+    renderer.setColors(colors);
 }
 
-pane.on('change', update);
+pane.on('change', PaneUpdate);
+
+const grid = new Grid(10, 10);
+
+const renderer = new Renderer(canvas.getLayer('game'), grid);
+
+const controller = new Controller(canvas.getLayer('control'), grid);
+
+grid.test();
+function update(){
+    renderer.update();
+}
+
+
+function Loop() {
+    update();
+    requestAnimationFrame(Loop);
+}
+
+requestAnimationFrame(Loop);
 
