@@ -49,7 +49,20 @@ export class Stastics {
         this.update();
     }
 
-    get desciption() {
+    // 增量更新统计值
+    updateIncremental(data) {
+        for (let value of data) {
+            if (value !== null && value !== undefined && !isNaN(value)) {
+                this._max = Math.max(this._max, value);
+                this._min = Math.min(this._min, value);
+                this._average = (this._average * this._data.length + value) / (this._data.length + 1);
+                this._data.push(value);
+            }
+        }
+        console.log(this._data);
+    }
+
+    get description() {
         return {
             max: this._max,
             min: this._min,
@@ -120,4 +133,3 @@ export class Stastics {
     }
     
 }
-  

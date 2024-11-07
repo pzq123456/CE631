@@ -16,29 +16,47 @@ const canvas = new Canvas(myCanvas, ["game", "text", "control"], 1024, 1024, 0);
 const PARAMS = {
     color1: '#ff0055',
     color2: '#00ff55',
+    columns: 10,
+    rows: 10,
 };
 
 const pane = new Pane();
-
 pane.addBinding(PARAMS, 'color1');
 pane.addBinding(PARAMS, 'color2');
+pane.addBinding(PARAMS, 'columns', {
+    min: 1,
+    max: 100,
+    step: 1,
+});
+pane.addBinding(PARAMS, 'rows', {
+    min: 1,
+    max: 100,
+    step: 1,
+});
 
 function PaneUpdate() {
     const colors = interpolateColors(PARAMS.color1, PARAMS.color2, 100);
     renderer.setColors(colors);
+    grid = new Grid(PARAMS.rows, PARAMS.columns);
+    controller.setGrid(grid);
+    renderer.setGrid(grid);
 }
 
 pane.on('change', PaneUpdate);
 
-const grid = new Grid(10, 10);
+let grid = new Grid(10, 10);
 
-const renderer = new Renderer(canvas.getLayer('game'), grid);
+console.log(grid.description);
 
-const controller = new Controller(canvas.getLayer('control'), grid);
+let renderer = new Renderer(canvas.getLayer('game'), grid);
+
+let controller = new Controller(canvas.getLayer('control'), grid);
 
 // grid.test();
 function update(){
     renderer.update();
+    grid.update();
+    controller.update();
 }
 
 

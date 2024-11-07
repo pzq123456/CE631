@@ -27,6 +27,10 @@ export class Controller {
         };
     }
 
+    setGrid(grid) {
+        this.#grid = grid;
+    }
+
     /**
      * 初始化事件绑定
      */
@@ -85,6 +89,7 @@ export class Controller {
         // console.log(`Grid data updated at row: ${row}, col: ${col}`);
 
         this.#grid.setCell(row, col, Math.random() * 100);
+        console.log(this.#grid.getCell(row, col));
         console.log(`Grid data updated at row: ${row}, col: ${col}`);
     }
 
@@ -107,6 +112,25 @@ export class Controller {
      */
     getMousePosition() {
         return this.#mousePosition;
+    }
+
+    drawHover() {
+        const { x, y, row, col } = this.#mousePosition;
+        const { width, height } = this.cellSize;
+
+        this.#controlCanvas.getContext('2d').clearRect(0, 0, this.#controlCanvas.width, this.#controlCanvas.height);
+
+        this.#controlCanvas.getContext('2d').strokeStyle = 'gray';
+        this.#controlCanvas.getContext('2d').strokeRect(col * width, row * height, width, height);
+    }
+
+    render() {
+        this.drawHover();
+    }
+
+    update() {
+        this.#controlCanvas.getContext('2d').clearRect(0, 0, this.#controlCanvas.width, this.#controlCanvas.height);
+        this.render();
     }
 }
 
