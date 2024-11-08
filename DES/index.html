@@ -3,31 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fire Spread Simulation</title>
-    <style>
-        #grid {
-            display: grid;
-            grid-template-columns: repeat(10, 30px);
-            gap: 2px;
-        }
-        .cell {
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            font-size: 14px;
-        }
-        .unburned { background-color: #9acd32; }  /* 未燃烧 */
-        .burning { background-color: #ff4500; color: white; }  /* 燃烧中 */
-        .burned { background-color: #555; color: white; }  /* 燃烧结束 */
-    </style>
+    <title>Fire Spread Simulation with Canvas</title>
 </head>
 <body>
 
 <h1>Fire Spread Simulation</h1>
-<div id="grid"></div>
+<canvas id="canvas" width="300" height="300"></canvas>
 
 <script>
+    class Logger {
+        static log(message) {
+            console.log(`[${new Date().toISOString()}] ${message}`);
+        }
+    }
+
     class Event {
         constructor(time) {
             this.time = time;
@@ -38,45 +27,49 @@
     }
 
     class FireSpreadEvent extends Event {
-        constructor(time, grid, x, y) {
+        constructor(time, grid, renderer, x, y) {
             super(time);
             this.grid = grid;
+            this.renderer = renderer;
             this.x = x;
             this.y = y;
         }
-        
+
         execute() {
+            Logger.log(`Executing FireSpreadEvent at (${this.x}, ${this.y}) on ${this.time}`);
             const cell = this.grid.getCell(this.x, this.y);
             if (cell.status === "unburned") {
                 cell.status = "burning";
-                this.grid.render();
+                this.renderer.render(this.grid);
 
                 // Schedule fire spread to neighboring cells
                 const neighbors = this.grid.getNeighbors(this.x, this.y);
                 for (let neighbor of neighbors) {
                     if (neighbor.status === "unburned" && Math.random() > 0.3) {
-                        this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, neighbor.x, neighbor.y));
+                        this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, this.renderer, neighbor.x, neighbor.y));
                     }
                 }
-                
+
                 // Schedule the cell to burn out
-                this.grid.addEvent(new BurnOutEvent(this.time + 2, this.grid, this.x, this.y));
+                this.grid.addEvent(new BurnOutEvent(this.time + 2, this.grid, this.renderer, this.x, this.y));
             }
         }
     }
 
     class BurnOutEvent extends Event {
-        constructor(time, grid, x, y) {
+        constructor(time, grid, renderer, x, y) {
             super(time);
             this.grid = grid;
+            this.renderer = renderer;
             this.x = x;
             this.y = y;
         }
 
         execute() {
+            Logger.log(`Executing BurnOutEvent at (${this.x}, ${this.y})`);
             const cell = this.grid.getCell(this.x, this.y);
             cell.status = "burned";
-            this.grid.render();
+            this.renderer.render(this.grid);
         }
     }
 
@@ -125,7 +118,12 @@
                 this.getCell(x + 1, y),
                 this.getCell(x - 1, y),
                 this.getCell(x, y + 1),
-                this.getCell(x, y - 1)
+                this.getCell(x, y - 1),
+
+                this.getCell(x + 1, y + 1),
+                this.getCell(x - 1, y - 1),
+                this.getCell(x + 1, y - 1),
+                this.getCell(x - 1, y + 1)
             ].filter(cell => cell !== undefined);
         }
 
@@ -139,33 +137,53 @@
                 event.execute();
             }
         }
+    }
 
-        render() {
-            const gridContainer = document.getElementById("grid");
-            gridContainer.innerHTML = "";  // Clear the grid
-            
-            for (let row of this.cells) {
-                for (let cell of row) {
-                    const cellElement = document.createElement("div");
-                    cellElement.className = `cell ${cell.status}`;
-                    cellElement.innerText = cell.status === "burning" ? "🔥" : "";
-                    gridContainer.appendChild(cellElement);
+    class Renderer {
+        constructor(canvas, cellSize) {
+            this.canvas = canvas;
+            this.context = canvas.getContext("2d");
+            this.cellSize = cellSize;
+        }
+
+        render(grid) {
+            const ctx = this.context;
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            for (let y = 0; y < grid.size; y++) {
+                for (let x = 0; x < grid.size; x++) {
+                    const cell = grid.getCell(x, y);
+                    ctx.fillStyle = this.getColor(cell.status);
+                    ctx.fillRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
                 }
+            }
+        }
+
+        getColor(status) {
+            switch (status) {
+                case "unburned": return "#9acd32";  // green
+                case "burning": return "#ff4500";   // red
+                case "burned": return "#555";       // gray
+                default: return "#ffffff";          // white
             }
         }
     }
 
-    // Initialize the grid and start the simulation
-    const grid = new Grid(10);
-    grid.render();
+    // Initialize canvas and grid
+    const canvas = document.getElementById("canvas");
+    const gridSize = 10;
+    const cellSize = 30;
+    const renderer = new Renderer(canvas, cellSize);
+    const grid = new Grid(gridSize);
+    renderer.render(grid);
 
     // Add initial fire event at the center
-    grid.addEvent(new FireSpreadEvent(0, grid, 5, 5));
+    grid.addEvent(new FireSpreadEvent(0, grid, renderer, Math.floor(gridSize / 2), Math.floor(gridSize / 2)));
 
     function runSimulation() {
         grid.step();
         if (!grid.eventQueue.isEmpty()) {
-            setTimeout(runSimulation, 500);  // Continue with the next step
+            setTimeout(runSimulation, 500);
         }
     }
 
