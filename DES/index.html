@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Spread Simulation</title>
+    <style>
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            gap: 2px;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            font-size: 14px;
+        }
+        .unburned { background-color: #9acd32; }  /* 未燃烧 */
+        .burning { background-color: #ff4500; color: white; }  /* 燃烧中 */
+        .burned { background-color: #555; color: white; }  /* 燃烧结束 */
+    </style>
+</head>
+<body>
+
+<h1>Fire Spread Simulation</h1>
+<div id="grid"></div>
+
+<script>
+    class Event {
+        constructor(time) {
+            this.time = time;
+        }
+        execute() {
+            throw new Error("Execute method should be implemented in subclasses");
+        }
+    }
+
+    class FireSpreadEvent extends Event {
+        constructor(time, grid, x, y) {
+            super(time);
+            this.grid = grid;
+            this.x = x;
+            this.y = y;
+        }
+        
+        execute() {
+            const cell = this.grid.getCell(this.x, this.y);
+            if (cell.status === "unburned") {
+                cell.status = "burning";
+                this.grid.render();
+
+                // Schedule fire spread to neighboring cells
+                const neighbors = this.grid.getNeighbors(this.x, this.y);
+                for (let neighbor of neighbors) {
+                    if (neighbor.status === "unburned" && Math.random() > 0.3) {
+                        this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, neighbor.x, neighbor.y));
+                    }
+                }
+                
+                // Schedule the cell to burn out
+                this.grid.addEvent(new BurnOutEvent(this.time + 2, this.grid, this.x, this.y));
+            }
+        }
+    }
+
+    class BurnOutEvent extends Event {
+        constructor(time, grid, x, y) {
+            super(time);
+            this.grid = grid;
+            this.x = x;
+            this.y = y;
+        }
+
+        execute() {
+            const cell = this.grid.getCell(this.x, this.y);
+            cell.status = "burned";
+            this.grid.render();
+        }
+    }
+
+    class EventQueue {
+        constructor() {
+            this.queue = [];
+        }
+
+        addEvent(event) {
+            this.queue.push(event);
+            this.queue.sort((a, b) => a.time - b.time);
+        }
+
+        getNextEvent() {
+            return this.queue.shift();
+        }
+
+        isEmpty() {
+            return this.queue.length === 0;
+        }
+    }
+
+    class Cell {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.status = "unburned"; // possible values: "unburned", "burning", "burned"
+        }
+    }
+
+    class Grid {
+        constructor(size) {
+            this.size = size;
+            this.cells = Array.from({ length: size }, (_, y) =>
+                Array.from({ length: size }, (_, x) => new Cell(x, y))
+            );
+            this.eventQueue = new EventQueue();
+        }
+
+        getCell(x, y) {
+            return this.cells[y] && this.cells[y][x];
+        }
+
+        getNeighbors(x, y) {
+            return [
+                this.getCell(x + 1, y),
+                this.getCell(x - 1, y),
+                this.getCell(x, y + 1),
+                this.getCell(x, y - 1)
+            ].filter(cell => cell !== undefined);
+        }
+
+        addEvent(event) {
+            this.eventQueue.addEvent(event);
+        }
+
+        step() {
+            if (!this.eventQueue.isEmpty()) {
+                const event = this.eventQueue.getNextEvent();
+                event.execute();
+            }
+        }
+
+        render() {
+            const gridContainer = document.getElementById("grid");
+            gridContainer.innerHTML = "";  // Clear the grid
+            
+            for (let row of this.cells) {
+                for (let cell of row) {
+                    const cellElement = document.createElement("div");
+                    cellElement.className = `cell ${cell.status}`;
+                    cellElement.innerText = cell.status === "burning" ? "🔥" : "";
+                    gridContainer.appendChild(cellElement);
+                }
+            }
+        }
+    }
+
+    // Initialize the grid and start the simulation
+    const grid = new Grid(10);
+    grid.render();
+
+    // Add initial fire event at the center
+    grid.addEvent(new FireSpreadEvent(0, grid, 5, 5));
+
+    function runSimulation() {
+        grid.step();
+        if (!grid.eventQueue.isEmpty()) {
+            setTimeout(runSimulation, 500);  // Continue with the next step
+        }
+    }
+
+    runSimulation();
+</script>
+
+</body>
+</html>
