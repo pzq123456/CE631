@@ -9,6 +9,8 @@ import { Renderer } from './src/render.js';
 
 import { Controller } from './src/control.js';
 
+import { throttle } from './src/utils.js';
+
 const myCanvas = document.getElementById('myCanvas');
 
 const canvas = new Canvas(myCanvas, ["game", "text", "control"], 1024, 1024, 0);
@@ -42,7 +44,7 @@ function PaneUpdate() {
     renderer.setGrid(grid);
 }
 
-pane.on('change', PaneUpdate);
+pane.on('change', throttle(PaneUpdate, 100));
 
 let grid = new Grid(10, 10);
 
