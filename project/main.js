@@ -1,210 +1,64 @@
-class Logger {
-    static log(message, type = "info") {
-        switch (type) {
-            case "info":
-                console.log(`[${new Date().toISOString()}] ${message}`);
-                break;
-            case "warn":
-                console.warn(`[${new Date().toISOString()}] ${message}`);
-                break;
-            case "error":
-                console.error(`[${new Date().toISOString()}] ${message}`);
-                break;
-        }
-    }
-}
+import { Grid } from "./grid.js";
+import { Renderer, CellRenderer, WindRenderer } from "./render.js";
+import { FireSpreadEvent } from "./models/fire.js";
 
-class Event {
-    constructor(time) {
-        this.time = time;
-    }
-    execute() {
-        throw new Error("Execute method should be implemented in subclasses");
-    }
-}
+import { FireSpreadAnalysis } from "./models/analysis.js";
 
-class FireSpreadEvent extends Event {
-    constructor(time, grid, x, y) {
-        super(time);
-        this.grid = grid;
-        this.x = x;
-        this.y = y;
-    }
+import { GaussianDistribution, DiscreteDistribution } from "./distributions.js";
 
-    execute() {
-        Logger.log(`Executing FireSpreadEvent at (${this.x}, ${this.y}) on ${this.time}`);
-        const cell = this.grid.getCell(this.x, this.y);
-        if (cell && cell.status === "unburned") {
-            cell.status = "burning";
+import { Environment } from "./models/environment.js";
 
-            // Schedule fire spread to neighboring cells
-            const neighbors = this.grid.getNeighbors(this.x, this.y);
-            for (let neighbor of neighbors) {
-                if (neighbor.status === "unburned" && Math.random() > 0.3) {
-                    this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, neighbor.x, neighbor.y));
-                }
-            }
-
-            const burningTime = Math.floor(Math.random() * 5) + 1;  // Random burning time between 1 and 5
-
-            // log the burning time
-            Logger.log(`Burning time for (${this.x}, ${this.y}) is ${burningTime}`,"error");
-
-            // Schedule the cell to burn out
-            this.grid.addEvent(new BurnOutEvent(this.time + burningTime, this.grid, this.x, this.y));
-        }
-    }
-}
-
-class BurnOutEvent extends Event {
-    constructor(time, grid, x, y) {
-        super(time);
-        this.grid = grid;
-        this.x = x;
-        this.y = y;
-    }
-
-    execute() {
-        Logger.log(`Executing BurnOutEvent at (${this.x}, ${this.y}) on ${this.time}`,"warn");
-
-        const cell = this.grid.getCell(this.x, this.y);
-        if (cell) {
-            cell.status = "burned";
-        }
-    }
-}
-
-class EventQueue {
-    constructor() {
-        this.queue = [];
-        this.record = [];
-    }
-
-    addEvent(event) {
-        this.queue.push(event);
-        this.queue.sort((a, b) => a.time - b.time);
-    }
-
-    getNextEvent() {
-        this.record.push(this.queue[0]);
-        return this.queue.shift();
-    }
-
-    isEmpty() {
-        return this.queue.length === 0;
-    }
-
-    getRecord() {
-        return this.record;
-    }
-}
-
-class Cell {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.status = "unburned"; // possible values: "unburned", "burning", "burned"
-    }
-}
-
-class Grid {
-    constructor(size) {
-        this.size = size;
-        this.cells = Array.from({ length: size }, (_, y) =>
-            Array.from({ length: size }, (_, x) => new Cell(x, y))
-        );
-        this.eventQueue = new EventQueue();
-    }
-
-    // Returns the cell at (x, y) if within bounds, otherwise returns null
-    getCell(x, y) {
-        if (x >= 0 && x < this.size && y >= 0 && y < this.size) {
-            return this.cells[y][x];
-        }
-        return null;  // Return null if out of bounds
-    }
-
-    getNeighbors(x, y) {
-        // Fetch neighbors while checking bounds
-        return [
-            this.getCell(x + 1, y),
-            this.getCell(x - 1, y),
-            this.getCell(x, y + 1),
-            this.getCell(x, y - 1),
-            this.getCell(x + 1, y + 1),
-            this.getCell(x - 1, y - 1),
-            this.getCell(x + 1, y - 1),
-            this.getCell(x - 1, y + 1)
-        ].filter(cell => cell !== null);  // Filter out null values for out-of-bounds cells
-    }
-
-    addEvent(event) {
-        this.eventQueue.addEvent(event);
-    }
-
-    step() {
-        if (!this.eventQueue.isEmpty()) {
-            const event = this.eventQueue.getNextEvent();
-            event.execute();
-        }
-    }
-}
-
-class Renderer {
-    constructor(canvas, cellSize) {
-        this.canvas = canvas;
-        this.context = canvas.getContext("2d");
-        this.cellSize = cellSize;
-    }
-
-    render(grid) {
-        const ctx = this.context;
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        for (let y = 0; y < grid.size; y++) {
-            for (let x = 0; x < grid.size; x++) {
-                const cell = grid.getCell(x, y);
-                ctx.fillStyle = this.getColor(cell.status);
-                ctx.fillRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
-            }
-        }
-    }
-
-    getColor(status) {
-        switch (status) {
-            case "unburned": return "#9acd32";  // green
-            case "burning": return "#ff4500";   // red
-            case "burned": return "#555";       // gray
-            default: return "#ffffff";          // white
-        }
-    }
-}
 
 // Initialize canvas, renderer, and grid
 const canvas = document.getElementById("canvas");
-const gridSize = 10;
-const cellSize = 100;
+
+const gridSize = 100;
+const cellSize = 10;
+
 const renderer = new Renderer(canvas, cellSize);
+
 const grid = new Grid(gridSize);
+// 添加渲染策略
+renderer.addStrategy(new CellRenderer(renderer.context, cellSize));
+
+renderer.addStrategy(new WindRenderer(renderer.context, cellSize));
+
+
 renderer.render(grid);
 
-// Add initial fire event at the center
-grid.addEvent(new FireSpreadEvent(0, grid, Math.floor(gridSize / 2), Math.floor(gridSize / 2)));
+const windDirectionDist = new DiscreteDistribution({ "NE": 0.6, "E": 0.2, "SE": 0.1, "N": 0.1 , "S": 0.0, "W": 0.0, "NW": 0.0, "SW": 0.0 });
+const windSpeedDist = new GaussianDistribution(10, 2);  // 例如：平均风速 10，方差 2
 
-// Simulation control and rendering loop
-let simulationSpeed = 1;  // Adjust this to control the simulation speed
+const environment = new Environment(windDirectionDist, windSpeedDist);
 
-function simulationLoop() {
-    for (let i = 0; i < simulationSpeed; i++) {
-        grid.step();
-    }
-    setTimeout(simulationLoop, 100);  // Simulation frequency
-}
+// add initial fire event
+grid.addEvent(new FireSpreadEvent(0, grid, environment, Math.floor(gridSize / 2), Math.floor(gridSize / 2)));
+
+// 模拟循环
+// while (grid.hasPendingEvents()) {
+//     grid.step();
+// }
+const timeStep = 100; // 1s
+
+setInterval(() => {
+    grid.step();
+    renderer.render(grid);
+}, timeStep);
 
 function renderLoop() {
     renderer.render(grid);
     requestAnimationFrame(renderLoop);  // Render at the browser's frame rate
 }
 
-simulationLoop();
 renderLoop();
+
+const analysis = new FireSpreadAnalysis(grid);
+
+// 定期调用 update 方法进行增量统计
+setInterval(() => {
+    analysis.update();
+    console.log("当前总蔓延区域:", analysis.getTotalSpreadArea());
+    console.log("火灾最大蔓延时间步:", analysis.getMaxSpreadTime());
+    console.log("平均燃烧时间:", analysis.getAverageBurnTime());
+}, 1000);  // 每秒更新一次
+
