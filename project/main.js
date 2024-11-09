@@ -1,6 +1,16 @@
 class Logger {
-    static log(message) {
-        console.log(`[${new Date().toISOString()}] ${message}`);
+    static log(message, type = "info") {
+        switch (type) {
+            case "info":
+                console.log(`[${new Date().toISOString()}] ${message}`);
+                break;
+            case "warn":
+                console.warn(`[${new Date().toISOString()}] ${message}`);
+                break;
+            case "error":
+                console.error(`[${new Date().toISOString()}] ${message}`);
+                break;
+        }
     }
 }
 
@@ -35,8 +45,13 @@ class FireSpreadEvent extends Event {
                 }
             }
 
+            const burningTime = Math.floor(Math.random() * 5) + 1;  // Random burning time between 1 and 5
+
+            // log the burning time
+            Logger.log(`Burning time for (${this.x}, ${this.y}) is ${burningTime}`,"error");
+
             // Schedule the cell to burn out
-            this.grid.addEvent(new BurnOutEvent(this.time + 2, this.grid, this.x, this.y));
+            this.grid.addEvent(new BurnOutEvent(this.time + burningTime, this.grid, this.x, this.y));
         }
     }
 }
@@ -50,7 +65,8 @@ class BurnOutEvent extends Event {
     }
 
     execute() {
-        Logger.log(`Executing BurnOutEvent at (${this.x}, ${this.y})`);
+        Logger.log(`Executing BurnOutEvent at (${this.x}, ${this.y}) on ${this.time}`,"warn");
+
         const cell = this.grid.getCell(this.x, this.y);
         if (cell) {
             cell.status = "burned";
@@ -61,6 +77,7 @@ class BurnOutEvent extends Event {
 class EventQueue {
     constructor() {
         this.queue = [];
+        this.record = [];
     }
 
     addEvent(event) {
@@ -69,11 +86,16 @@ class EventQueue {
     }
 
     getNextEvent() {
+        this.record.push(this.queue[0]);
         return this.queue.shift();
     }
 
     isEmpty() {
         return this.queue.length === 0;
+    }
+
+    getRecord() {
+        return this.record;
     }
 }
 
@@ -171,11 +193,12 @@ grid.addEvent(new FireSpreadEvent(0, grid, Math.floor(gridSize / 2), Math.floor(
 
 // Simulation control and rendering loop
 let simulationSpeed = 1;  // Adjust this to control the simulation speed
+
 function simulationLoop() {
     for (let i = 0; i < simulationSpeed; i++) {
         grid.step();
     }
-    setTimeout(simulationLoop, 10);  // Simulation frequency
+    setTimeout(simulationLoop, 100);  // Simulation frequency
 }
 
 function renderLoop() {
