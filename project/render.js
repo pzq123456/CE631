@@ -1,7 +1,11 @@
 class RenderStrategy {
-    constructor(context, cellSize) {
-        this.context = context;
-        this.cellSize = cellSize;
+    constructor(canvas, gridSize) {
+        this.canvas = canvas;
+        this.gridSize = gridSize;
+        this.width = canvas.width;
+        this.height = canvas.height;
+        this.context = canvas.getContext("2d");
+        this.cellSize = this.width / gridSize;
     }
 
     render(grid) {
