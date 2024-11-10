@@ -6,10 +6,10 @@ export class Cell {
         this.status = "unburned"; // 状态：未燃烧、燃烧中、已燃烧
     }
 
-    // 根据格网类型确定燃烧是否可能
-    isFlammable() {
-        return this.type !== "water" && this.type !== "fire-resistant";
-    }
+    // // 根据格网类型确定燃烧是否可能
+    // isFlammable() {
+    //     return this.type !== "water" && this.type !== "fire-resistant";
+    // }
 
     // 返回此类型的燃烧蔓延概率调整
     getSpreadResistance() {

@@ -8,6 +8,7 @@ export class Grid {
             Array.from({ length: size }, (_, x) => new Cell(x, y))
         );
         this.eventQueue = new EventQueue();
+        this.burningCells = new Set();  // 用于跟踪所有正在燃烧的单元格
     }
 
     // Returns the cell at (x, y) if within bounds, otherwise returns null
@@ -34,6 +35,32 @@ export class Grid {
 
     addEvent(event) {
         this.eventQueue.addEvent(event);
+    }
+
+    getCurrentTime() {
+        return this.eventQueue.getCurrentTime();
+    }
+
+    overrideEvent(x,y,type,newEvent){
+        this.eventQueue.overrideEvent(x,y,type,newEvent);
+    }
+
+    // 添加正在燃烧的单元格到列表中
+    addBurningCell(x, y) {
+        this.burningCells.add(`${x},${y}`);
+    }
+
+    // 从燃烧列表中移除燃尽的单元格
+    removeBurningCell(x, y) {
+        this.burningCells.delete(`${x},${y}`);
+    }
+    
+    // 获取当前所有正在燃烧的单元格位置
+    getBurningCells() {
+        return Array.from(this.burningCells).map(pos => {
+            const [x, y] = pos.split(",").map(Number);
+            return { x, y };
+        });
     }
 
     step() {

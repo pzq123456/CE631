@@ -1,12 +1,14 @@
 import { Grid } from "./grid.js";
 import { FireSpreadEvent } from "./models/fire.js";
 
-import { Renderer, CellRenderer, WindRenderer } from "./render.js";
+import { Renderer, CellRenderer, WindRenderer, FirefighterRenderer } from "./render.js";
 
 import { GaussianDistribution, DiscreteDistribution } from "./distributions.js";
 import { Environment } from "./models/environment.js";
 
 import { FireSpreadAnalysis } from "./models/analysis.js";
+
+import { FirefighterEvent, Firefighter } from "./models/people.js";
 
 const canvas = document.getElementById("canvas");
 
@@ -15,8 +17,7 @@ const gridSize = 10;
 // 渲染器及对应的渲染策略
 const renderer = new Renderer(canvas, gridSize);
 
-renderer.addStrategy(new CellRenderer(renderer.canvas, gridSize));
-renderer.addStrategy(new WindRenderer(renderer.canvas, gridSize));
+
 
 const grid = new Grid(gridSize);
 
@@ -35,7 +36,26 @@ const analysis = new FireSpreadAnalysis(grid);
 
 grid.addEvent(new FireSpreadEvent(0, grid, environment, Math.floor(gridSize / 2), Math.floor(gridSize / 2)));
 
-const timeStep = 100; // 1 秒
+// 创建消防员并添加到事件队列
+const firefighters = [];
+const numFirefighters = 10;
+
+for (let i = 0; i < numFirefighters; i++) {
+    const firefighter = new Firefighter(grid, gridSize - 1, gridSize - 1);
+    firefighters.push(firefighter);
+    grid.addEvent(new FirefighterEvent(0, firefighter));
+}
+
+// grid.addEvent(new FirefighterEvent(0, firefighters[0]));
+// grid.addEvent(new FirefighterEvent(0, firefighters[1]));
+
+
+const timeStep = 10; // 1 秒
+
+renderer.addStrategy(new CellRenderer(renderer.canvas, gridSize));
+renderer.addStrategy(new WindRenderer(renderer.canvas, gridSize));
+renderer.addStrategy(new FirefighterRenderer(canvas, gridSize, firefighters));
+let count = 10000;
 
 simuateLoop();
 renderLoop();
@@ -48,6 +68,11 @@ function renderLoop() {
 
 function simuateLoop() {
     grid.step();
+    count--;
+    if(count <0) {
+        console.log(grid.getRecord());
+        return;
+    }
     setTimeout(simuateLoop, timeStep);
 }
 
