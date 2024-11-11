@@ -10,7 +10,13 @@ import { FireSpreadAnalysis } from "./models/analysis.js";
 
 import { FirefighterEvent, Firefighter } from "./models/people.js";
 
+// visualization
+
+import { barChart } from "./chart.js";
+
 const canvas = document.getElementById("canvas");
+
+const chartCanvas = document.getElementById("myChart");
 
 const gridSize = 10;
 
@@ -87,7 +93,17 @@ function analysisLoop() {
         console.log("当前总蔓延区域:", analysis.getTotalSpreadArea());
         console.log("火灾最大蔓延时间步:", analysis.getMaxSpreadTime());
         console.log("平均燃烧时间:", analysis.getAverageBurnTime());
-        console.log("每个时间步燃烧的格子数:", analysis.getSpreadAreaOverTime());
+        // console.log("每个时间步燃烧的格子数:", analysis.getSpreadAreaOverTime());
+
+
+        const spreadAreaOverTime = analysis.getSpreadAreaOverTime();
+
+        barChart(chartCanvas.getContext('2d'), {
+            labels: Object.keys(spreadAreaOverTime),
+            data: Object.values(spreadAreaOverTime),
+            label: 'Spread Area'
+        });
+
         console.log(
             grid.getRecord().map(event => {
                 return {
@@ -100,3 +116,9 @@ function analysisLoop() {
         )
     }
 }
+
+// barChart(chartCanvas.getContext('2d'), {
+//     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+//     data: [12, 19, 3, 5, 2, 3],
+//     label: '# of Votes'
+// });
