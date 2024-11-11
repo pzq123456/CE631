@@ -23,12 +23,26 @@ export class CellRenderer extends RenderStrategy {
         }
     }
 
+    drawCell(cell){
+        this.context.fillStyle = this.getColor(cell.status);
+        this.context.fillRect(cell.x * this.cellSize, cell.y * this.cellSize, this.cellSize, this.cellSize);
+    }
+
+    // cell.remainingBurnTime
+    drawCellStatus(cell){
+        if(cell.status !== "burning") return;
+        const ctx = this.context;
+        ctx.fillStyle = "white";
+        ctx.font = "24px Arial";
+        ctx.fillText(cell.remainingBurnTime, cell.x * this.cellSize + this.cellSize / 2 - 10, cell.y * this.cellSize + this.cellSize / 2 + 10);
+    }
+
     render(grid) {
         for (let y = 0; y < grid.size; y++) {
             for (let x = 0; x < grid.size; x++) {
                 const cell = grid.getCell(x, y);
-                this.context.fillStyle = this.getColor(cell.status);
-                this.context.fillRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
+                this.drawCell(cell);
+                this.drawCellStatus(cell);
             }
         }
     }
@@ -195,8 +209,8 @@ export class FirefighterRenderer extends RenderStrategy {
 // 信息渲染测略，将当前时间步渲染在画布上 左上角
 export class InfoRenderer extends RenderStrategy {
     render(grid) {
-        this.context.fillStyle = "#000000";
-        this.context.font = "20px Arial";
+        this.context.fillStyle = "white";
+        this.context.font = "24px Arial";
         this.context.fillText(`Time: ${grid.getCurrentTime()}`, 10, 30);
     }
 }

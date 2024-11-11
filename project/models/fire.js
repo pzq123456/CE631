@@ -9,49 +9,13 @@ export class FireSpreadEvent extends Event {
         this.y = y;
     }
 
-    // execute() {
-    //     const cell = this.grid.getCell(this.x, this.y);
-        
-    //     // 确保当前cell存在且处于燃烧状态
-    //     if (!cell) return;
-
-    //     // 若是首次执行（初始点燃）
-    //     if (cell.status === "unburned") {
-    //         cell.status = "burning";
-    //         cell.remainingBurnTime = Math.floor(Math.random() * 100) + 1 + Math.floor(5 / this.environment.getWindSpeed());
-    //         cell.windDirection = this.environment.getWindDirection();
-    //         cell.windSpeed = this.environment.getWindSpeed();
-    //     }
-
-    //     // 持续尝试点燃相邻的未燃烧单元格
-    //     this.forEachNeighbor(this.x, this.y, (neighbor) => {
-    //         if (neighbor.status === "unburned") {
-    //             const spreadProbability = this.calculateSpreadProbability(neighbor, cell.windDirection);
-    //             if (Math.random() < spreadProbability) {
-    //                 this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, this.environment, neighbor.x, neighbor.y));
-    //             }
-    //         }
-    //     });
-
-    //     // 更新燃烧时间
-    //     cell.remainingBurnTime--;
-
-    //     // 若燃烧结束，生成燃尽事件
-    //     if (cell.remainingBurnTime <= 0) {
-    //         this.grid.addEvent(new BurnOutEvent(this.time + 1, this.grid, this.x, this.y));
-    //     } else {
-    //         // 继续燃烧，下一时刻触发
-    //         this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, this.environment, this.x, this.y, this.remainingBurnTime));
-    //     }
-    // }
-
     execute() {
         const cell = this.grid.getCell(this.x, this.y);
         if (!cell) return;
     
         if (cell.status === "unburned") {
             cell.status = "burning";
-            cell.remainingBurnTime = Math.floor(Math.random() * 100) + 1 + Math.floor(5 / this.environment.getWindSpeed());
+            cell.remainingBurnTime = Math.floor(Math.random() * 30) + 1 + Math.floor(5 / this.environment.getWindSpeed());
             cell.windDirection = this.environment.getWindDirection();
             cell.windSpeed = this.environment.getWindSpeed();
         }
@@ -97,12 +61,6 @@ export class FireSpreadEvent extends Event {
             action(neighbor);
         }
     }
-
-    // calculateSpreadProbability(neighbor, windDirection) {
-    //     const directionFactor = this.getDirectionFactor(neighbor, windDirection);
-    //     const spreadResistance = neighbor.getSpreadResistance();
-    //     return 0.8 * directionFactor * spreadResistance;
-    // }
 
     getDirectionFactor(neighbor, windDirection) {
         const neighborDirection = this.getNeighborDirection(neighbor);

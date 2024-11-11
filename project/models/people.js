@@ -23,8 +23,15 @@ export class Firefighter {
     move(targetX, targetY) {
         const targetCell = this.grid.getCell(targetX, targetY);
         if (targetCell) {
-            this.x = targetX;
+
+            const disturbance = randomInt(-1, 2); // 某些情况下可以实现对角线移动
+            
+            this.x = targetX + disturbance;
             this.y = targetY;
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
     }
 
@@ -41,10 +48,13 @@ export class Firefighter {
                 // 消防员灭火
                 this.extinguish(cell);
             }
-
-        } else {
+        } else if (cell && cell.status === "unburned") {
+            // 有一定概率铺设隔离带
+            if (Math.random() < 0.5) {
+                this.setFireBreak(cell);
+            }
+        }else {
             this.remainingTime = this.extinguishTime;  // 重置灭火计时器
-            // this.moveTowardsFire();  // 移动到下一个着火区域
 
             if (this.stamina <= 0) {
                 return;  // 无法继续移动
@@ -71,6 +81,17 @@ export class Firefighter {
             // 消耗体力和水量
             this.stamina -= 10;
             this.water -= 10;
+        }
+    }
+
+    //铺设隔离带 将当前单元格 标记为燃尽状态
+    setFireBreak(cell) {
+        // 检查体力
+        if (this.stamina <= 0) {
+            return;  // 无法继续行动
+        }else{
+            this.stamina -= 20;
+            cell.status = "burned";
         }
     }
 
