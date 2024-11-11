@@ -67,6 +67,9 @@ export class Grid {
         if (!this.eventQueue.isEmpty()) {
             const event = this.eventQueue.getNextEvent();
             event.execute();
+
+            // 优化： 合并相同时间步的事件，但是太快，就不利于观察。
+            // this.eventQueue.executeNextTimeStep();
         }
     }
 
