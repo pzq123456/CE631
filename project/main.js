@@ -23,8 +23,6 @@ const gridSize = 10;
 // 渲染器及对应的渲染策略
 const renderer = new Renderer(canvas, gridSize);
 
-
-
 const grid = new Grid(gridSize);
 
 renderer.render(grid);
@@ -52,16 +50,12 @@ for (let i = 0; i < numFirefighters; i++) {
     grid.addEvent(new FirefighterEvent(0, firefighter));
 }
 
-// grid.addEvent(new FirefighterEvent(0, firefighters[0]));
-// grid.addEvent(new FirefighterEvent(0, firefighters[1]));
-
-
 const timeStep = 10; // 1 秒
 
 renderer.addStrategy(new CellRenderer(renderer.canvas, gridSize));
 renderer.addStrategy(new WindRenderer(renderer.canvas, gridSize));
 renderer.addStrategy(new FirefighterRenderer(canvas, gridSize, firefighters));
-let count = 10000;
+let count = 1000;
 
 simuateLoop();
 renderLoop();
@@ -88,13 +82,10 @@ function analysisLoop() {
     if(grid.hasPendingEvents()) {
         // 还有未处理的事件
         setTimeout(analysisLoop, 1000);
-
     }else{
         console.log("当前总蔓延区域:", analysis.getTotalSpreadArea());
         console.log("火灾最大蔓延时间步:", analysis.getMaxSpreadTime());
         console.log("平均燃烧时间:", analysis.getAverageBurnTime());
-        // console.log("每个时间步燃烧的格子数:", analysis.getSpreadAreaOverTime());
-
 
         const spreadAreaOverTime = analysis.getSpreadAreaOverTime();
 
@@ -103,22 +94,5 @@ function analysisLoop() {
             data: Object.values(spreadAreaOverTime),
             label: 'Spread Area'
         });
-
-        console.log(
-            grid.getRecord().map(event => {
-                return {
-                    time: event.time,
-                    type: event.constructor.name,
-                    x: event.x,
-                    y: event.y
-                };
-            })
-        )
     }
 }
-
-// barChart(chartCanvas.getContext('2d'), {
-//     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-//     data: [12, 19, 3, 5, 2, 3],
-//     label: '# of Votes'
-// });
