@@ -157,6 +157,19 @@ export class Firefighter {
         }
     
         return results.length > 0 ? results : null;  // 返回所有找到的燃烧单元格，若无则返回 null
+
+        // const burningCells = this.grid.getBurningCells();
+        // const results = [];
+
+        // for (let cell of burningCells) {
+        //     results.push(cell);
+        //     if (results.length >= maxResults) {
+        //         return results;
+        //     }
+        // }
+
+        // return results.length > 0 ? results : null;
+
     }
     
 }

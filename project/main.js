@@ -12,11 +12,14 @@ import { FirefighterEvent, Firefighter } from "./models/people.js";
 
 // visualization
 
-import { barChart } from "./chart.js";
+import { barChart, radarChart } from "./chart.js";
 
 const canvas = document.getElementById("canvas");
 
-const chartCanvas = document.getElementById("myChart");
+const chartCanvas1 = document.getElementById("myChart1");
+const chartCanvas2 = document.getElementById("myChart2");
+const chartCanvas3 = document.getElementById("myChart3");
+
 
 const gridSize = 10;
 
@@ -50,7 +53,7 @@ for (let i = 0; i < numFirefighters; i++) {
     grid.addEvent(new FirefighterEvent(0, firefighter));
 }
 
-const timeStep = 10; // 1 秒
+const timeStep = 0; // 1 秒
 
 renderer.addStrategy(new CellRenderer(renderer.canvas, gridSize));
 renderer.addStrategy(new WindRenderer(renderer.canvas, gridSize));
@@ -68,11 +71,11 @@ function renderLoop() {
 
 function simuateLoop() {
     grid.step();
-    count--;
-    if(count <0) {
-        console.log(grid.getRecord());
-        return;
-    }
+    // count--;
+    // if(count <0) {
+    //     console.log(grid.getRecord());
+    //     return;
+    // }
     setTimeout(simuateLoop, timeStep);
 }
 
@@ -88,11 +91,22 @@ function analysisLoop() {
         console.log("平均燃烧时间:", analysis.getAverageBurnTime());
 
         const spreadAreaOverTime = analysis.getSpreadAreaOverTime();
+        // 打印风向和风速
+        console.log("风向:", analysis.getWindDirectionDistributionArray());
+        console.log("风速:", analysis.getWindSpeedDistribution());
 
-        barChart(chartCanvas.getContext('2d'), {
+        barChart(chartCanvas1.getContext('2d'), {
             labels: Object.keys(spreadAreaOverTime),
             data: Object.values(spreadAreaOverTime),
             label: 'Spread Area'
+        });
+
+        radarChart(chartCanvas2.getContext('2d'), analysis.getWindDirectionDistributionArray());
+
+        barChart(chartCanvas3.getContext('2d'), {
+            labels: Array.from(analysis.getWindSpeedDistribution().keys()),
+            data: Array.from(analysis.getWindSpeedDistribution().values()),
+            label: 'Wind Speed Distribution'
         });
     }
 }

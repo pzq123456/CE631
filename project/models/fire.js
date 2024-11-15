@@ -18,16 +18,22 @@ export class FireSpreadEvent extends Event {
             cell.remainingBurnTime = Math.floor(Math.random() * 30) + 1 + Math.floor(5 / this.environment.getWindSpeed());
             cell.windDirection = this.environment.getWindDirection();
             cell.windSpeed = this.environment.getWindSpeed();
+            this.grid.addBurningCell(this.x, this.y);
+
+            // console.log(this.windDirection);
+
+        }else if (cell.status === "burned") {
+            return;
+        }else{
+            cell.remainingBurnTime--;
         }
     
-        cell.remainingBurnTime--;
     
         // 遍历相邻单元格并标记它们用于扩散
         this.forEachNeighbor(this.x, this.y, (neighbor) => {
-            if (neighbor.status === "unburned" && !neighbor.scheduledForSpread) {
+            if (neighbor.status === "unburned") {
                 const spreadProbability = this.calculateSpreadProbability(neighbor, cell.windDirection);
                 if (Math.random() < spreadProbability) {
-                    neighbor.scheduledForSpread = true;
                     this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, this.environment, neighbor.x, neighbor.y));
                 }
             }
@@ -93,6 +99,7 @@ export class BurnOutEvent extends Event {
         const cell = this.grid.getCell(this.x, this.y);
         if (cell) {
             cell.status = "burned";
+            this.grid.removeBurningCell(this.x, this.y);
         }
     }
 }

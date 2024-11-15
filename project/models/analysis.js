@@ -10,6 +10,9 @@ export class FireSpreadAnalysis {
         
         // 新增：记录每个格子的燃烧开始时间和结束时间
         this.burnTimes = new Map();  // { "x,y": { startTime, endTime } }
+
+        // 记录风向和风速
+        this.windInfo = new Map();
     }
 
     // 增量更新事件列表和统计信息
@@ -33,6 +36,11 @@ export class FireSpreadAnalysis {
                     this.timeEventMap[event.time] = [];
                 }
                 this.timeEventMap[event.time].push(event);
+
+                this.windInfo.set(key, {
+                    windDirection: event.grid.getCell(event.x, event.y).windDirection, 
+                    windSpeed: event.grid.getCell(event.x, event.y).windSpeed 
+                });
 
             // 若是 BurnOutEvent，记录格子的燃烧结束时间
             } else if (event instanceof BurnOutEvent && this.burnTimes.has(key)) {
@@ -89,5 +97,45 @@ export class FireSpreadAnalysis {
         });
 
         return burnCount > 0 ? totalBurnTime / burnCount : 0;
+    }
+
+    // 获取风的分布情况以便绘制雷达图
+    getWindDirectionDistribution() {
+        // const windDirectionCounts = new Map();
+        // this.windInfo.forEach(info => {
+        //     const key = `${info.windDirection}`;
+        //     windDirectionCounts.set(key, (windDirectionCounts.get(key) || 0) + 1);
+        // });
+        // return windDirectionCounts;
+
+        // 首先创建一个包含了所有可能风向的数组
+        // { "NE": 0.3, "E": 0.3, "SE": 0.1, "N": 0.1 , "S": 0.1, "W": 0.1, "NW": 0.0, "SW": 0.0 }
+
+        const windDirectionCounts = new Map();
+        // 将所有方向初始化为 0
+        const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+        directions.forEach(direction => windDirectionCounts.set(direction, 0));
+
+        this.windInfo.forEach(info => {
+            const key = `${info.windDirection}`;
+            windDirectionCounts.set(key, windDirectionCounts.get(key) + 1);
+        });
+
+        return windDirectionCounts;
+    }
+
+    getWindDirectionDistributionArray() {
+        const windDirectionCounts = this.getWindDirectionDistribution();
+        return Array.from(windDirectionCounts.values());
+    }
+
+    // 获取每个风向的累计风速
+    getWindSpeedDistribution() {
+        const windSpeedCounts = new Map();
+        this.windInfo.forEach(info => {
+            const key = `${info.windDirection}`;
+            windSpeedCounts.set(key, (windSpeedCounts.get(key) || 0) + info.windSpeed);
+        });
+        return windSpeedCounts;
     }
 }
