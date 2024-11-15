@@ -126,7 +126,12 @@ export class FireSpreadAnalysis {
 
     getWindDirectionDistributionArray() {
         const windDirectionCounts = this.getWindDirectionDistribution();
-        return Array.from(windDirectionCounts.values());
+
+        // 将风向按照 N, NE, E, SE, S, SW, W, NW 的顺序排列
+        const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+        return directions.map(direction => windDirectionCounts.get(direction) || 0);
+
+        // return Array.from(windDirectionCounts.values());
     }
 
     // 获取每个风向的累计风速
@@ -136,6 +141,15 @@ export class FireSpreadAnalysis {
             const key = `${info.windDirection}`;
             windSpeedCounts.set(key, (windSpeedCounts.get(key) || 0) + info.windSpeed);
         });
+
         return windSpeedCounts;
+    }
+
+    getWindSpeedDistributionArray() {
+        const windSpeedCounts = this.getWindSpeedDistribution();
+
+        // 将风向按照 N, NE, E, SE, S, SW, W, NW 的顺序排列
+        const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+        return directions.map(direction => windSpeedCounts.get(direction) || 0);
     }
 }

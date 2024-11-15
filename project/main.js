@@ -103,6 +103,8 @@ function analysisLoop() {
 
         radarChart(chartCanvas2.getContext('2d'), analysis.getWindDirectionDistributionArray());
 
+        // radarChart(chartCanvas3.getContext('2d'), analysis.getWindSpeedDistributionArray());
+
         barChart(chartCanvas3.getContext('2d'), {
             labels: Array.from(analysis.getWindSpeedDistribution().keys()),
             data: Array.from(analysis.getWindSpeedDistribution().values()),

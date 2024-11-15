@@ -27,7 +27,7 @@ export function radarChart(ctx, data) {
       labels: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
       datasets: [{
         label: 'Wind Direction Distribution',
-        data: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0],
+        data: data,
         borderWidth: 1
       }]
     },
