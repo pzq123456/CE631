@@ -63,7 +63,7 @@ grid.addEvent(new FireSpreadEvent(0, grid, environment, Math.floor(gridSize / 2)
 
 // 创建消防员并添加到事件队列
 const firefighters = [];
-const numFirefighters = 30;
+const numFirefighters = 20;
 
 for (let i = 0; i < numFirefighters; i++) {
     const firefighter = new Firefighter(grid, gridSize - 1, gridSize - 1);
@@ -71,7 +71,7 @@ for (let i = 0; i < numFirefighters; i++) {
     grid.addEvent(new FirefighterEvent(0, firefighter));
 }
 
-const timeStep = 0; // 1 秒
+const timeStep = 10; // 1 秒
 
 renderer.addStrategy(new CellRenderer(renderer.canvas, gridSize));
 renderer.addStrategy(new WindRenderer(renderer.canvas, gridSize));
@@ -112,12 +112,12 @@ function analysisLoop() {
         console.log("风速:", analysis.getWindSpeedDistribution());
 
         barChart(chartCanvas1.getContext('2d'), Object.keys(spreadAreaOverTime),[{
-            data: Object.values(spreadAreaOverTime),
+            data: spreadAreaOverTime,
             label: 'Spread Area',
             color: 'red'
         },
         {
-            data: Object.values(analysis.getFirefighterExtinguishInfo()),
+            data: analysis.getFirefighterExtinguishInfo(),
             label: 'Firefighter Extinguish',
             color: 'blue'
         }
@@ -134,14 +134,11 @@ function analysisLoop() {
         const rowHeight = 20;
         const data = analysis.getEvents();
         const tabrender = new tableRender(tableParentDiv, rowHeight, data, renderRow);
-
     }
 }
 
 
 function renderRow(event, colorMapFn = colorMap) {
-    // return `<td>${event.time}</td><td>${event.constructor.name}</td><td>${event.x}</td><td>${event.y}</td>`;
-    // return `<td>${event.time}</td><td style="color:${colorMapFn(event.constructor.name)}">${event.constructor.name}</td><td>${event.x}</td><td>${event.y}</td>`;
 
     // 所有的数组都是绿色
     // 若没有X，Y坐标，则不显示
@@ -175,10 +172,3 @@ function colorMap(eventname) {
             return 'black';
     }
 }
-
-
-// Table
-// table-container
-
-// const render = new tableRender(parentDiv, rowHeight, totalRows);
-

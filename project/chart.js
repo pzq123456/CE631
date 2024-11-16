@@ -7,6 +7,9 @@ export function barChart(ctx, labels, datas) {
     },
     options: {
       scales: {
+        x: {
+          beginAtZero: true,
+        },
         y: {
           beginAtZero: true
         }

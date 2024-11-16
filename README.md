@@ -24,8 +24,7 @@ Subject project is a group work project (Maximum 3 students per group). Each gro
     intended process. You are acting as a part of the technical office team  submitting a progress report to your boss about the selected process. 
     c. Spread sheets that show all calculations and associated sketches, if necessary. 
     d. Equipment(s) description, details, and sketches from literature and companies. 
-    e. Explanation of data collection method about this construction process to 
-    calculate productivity. 
+    e. Explanation of data collection method about this construction process to calculate productivity. 
     f. Simulation procedures and features using both programs. 
     g. Productivity and cost estimation and analysis. 
     h. Results and conclusions. 
