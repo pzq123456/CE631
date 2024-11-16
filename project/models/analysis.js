@@ -1,4 +1,5 @@
 import { FireSpreadEvent, BurnOutEvent } from './fire.js';
+import { ExtinguishedEvent } from './people.js';
 
 export class FireSpreadAnalysis {
     constructor(grid) {
@@ -13,6 +14,9 @@ export class FireSpreadAnalysis {
 
         // 记录风向和风速
         this.windInfo = new Map();
+
+        // 记录消防员的行为
+        this.firefighterEvents = [];
     }
 
     // 增量更新事件列表和统计信息
@@ -48,10 +52,26 @@ export class FireSpreadAnalysis {
                 if (burnRecord.endTime === null) {
                     burnRecord.endTime = event.time;
                 }
+            } else if (event instanceof ExtinguishedEvent) {
+                this.firefighterEvents.push(event);
             }
         });
 
         this.events.push(...newEvents);
+    }
+
+    // 计算消防员每个时间步的扑灭火情况
+    getFirefighterExtinguishInfo() {
+        // 计算每个时间步的扑灭火情况
+        const extinguishInfo = {};
+        this.firefighterEvents.forEach(event => {
+            if (!extinguishInfo[event.time]) {
+                extinguishInfo[event.time] = 0;
+            }
+            extinguishInfo[event.time] += 1;
+        });
+
+        return extinguishInfo;
     }
 
     // 获取火势蔓延的总区域面积
@@ -151,5 +171,10 @@ export class FireSpreadAnalysis {
         // 将风向按照 N, NE, E, SE, S, SW, W, NW 的顺序排列
         const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
         return directions.map(direction => windSpeedCounts.get(direction) || 0);
+    }
+
+    // 输出事件列表以便可视化为表格
+    getEvents() {
+        return this.events;
     }
 }

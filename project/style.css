@@ -2,3 +2,18 @@
     width: 600px;
     height: 400px;
 }
+
+.table-container{
+    width: 600px;
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #000;
+}
+
+.left{
+    float: left;
+}
+
+.right{
+    float: right;
+}

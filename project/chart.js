@@ -1,13 +1,9 @@
-export function barChart(ctx, data) {
+export function barChart(ctx, labels, datas) {
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: data.labels,
-      datasets: [{
-        label: data.label,
-        data: data.data,
-        borderWidth: 1
-      }]
+      labels: labels,
+      datasets: datas
     },
     options: {
       scales: {

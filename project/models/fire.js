@@ -32,7 +32,7 @@ export class FireSpreadEvent extends Event {
         // 遍历相邻单元格并标记它们用于扩散
         this.forEachNeighbor(this.x, this.y, (neighbor) => {
             if (neighbor.status === "unburned") {
-                const spreadProbability = this.calculateSpreadProbability(neighbor, cell.windDirection);
+                const spreadProbability = this.calculateSpreadProbability(neighbor, cell.windDirection, cell.windSpeed);
                 if (Math.random() < spreadProbability) {
                     this.grid.addEvent(new FireSpreadEvent(this.time + 1, this.grid, this.environment, neighbor.x, neighbor.y));
                 }
@@ -46,7 +46,7 @@ export class FireSpreadEvent extends Event {
         }
     }
 
-    calculateSpreadProbability(neighbor, windDirection) {
+    calculateSpreadProbability(neighbor, windDirection, windSpeed) {
         const cacheKey = `${neighbor.x},${neighbor.y},${windDirection}`;
         if (!this.spreadProbabilitiesCache) {
             this.spreadProbabilitiesCache = {};
@@ -56,7 +56,7 @@ export class FireSpreadEvent extends Event {
         }
         const directionFactor = this.getDirectionFactor(neighbor, windDirection);
         const spreadResistance = neighbor.getSpreadResistance();
-        const probability = 0.8 * directionFactor * spreadResistance;
+        const probability = 0.8 * directionFactor * spreadResistance * (1 - Math.exp(-0.25 * windSpeed));
         this.spreadProbabilitiesCache[cacheKey] = probability;
         return probability;
     }
