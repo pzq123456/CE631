@@ -116,6 +116,32 @@ Firefighter actions are limited by stamina and water level. Each movement consum
 
 When firefighters are in a frozen state (e.g., due to external events), they stop all actions. This strategy logically ensures that the firefighters' state is linked to environmental events and provides room for introducing more complex scenarios (such as poisoning, obstacles, etc.) in the simulation.
 
+Strategy Diagram
+
+```mermaid
+
+graph LR
+    A[Firefighter] --> B[Extinguish Fire]
+    A --> C[Establish Firebreaks]
+    A --> D[Navigate Towards Fire]
+    A --> E[Resource Management]
+    A --> F[Freeze State Handling]
+    D --> G[Shortest Path]
+    D --> H[Random Offset]
+    D --> I[Random Target Selection]
+    E --> J[Stamina Consumption]
+    E --> K[Water Consumption]
+    F --> L[Stop All Actions]
+    B --> M[Consume Water & Time]
+    C --> N[Mark Cell as Non-flammable]
+    D --> O[Search for Nearest Fire Source]
+    E --> P[Low Consumption Actions]
+    F --> Q[External Events]
+    Q --> L
+
+```
+
+Figure 15: Firefighter Behavior Strategies
 
 通过这些策略，消防员能够在动态环境中快速适应变化，平衡灭火与资源管理，并有效限制火灾蔓延。这些行为策略的设计为复杂火灾模拟提供了可靠的基础，同时具备灵活的扩展性。
 
@@ -169,3 +195,114 @@ $$
 这种统一的角度定义方式不仅有助于减少计算错误，还能提高模型在复杂环境中的适用性和准确性。通过引入更多环境因素，模型可以更好地反映现实火灾传播的复杂性，为应急管理和火灾预防提供更准确的参考。
 
 公式中的经验系数（如 $0.8$ 或 $C$）通常用于校准火势传播概率，使其符合特定场景的观察数据。然而，这些系数的来源应尽可能依托实际数据分析，而非单纯依赖经验调参。例如，通过与历史火灾数据的对比验证，可以优化这些系数的设定，从而确保模型的普适性和科学性。对于某些特殊场景，还可以根据数据分布调整模型结构，如采用非线性拟合函数取代线性组合形式，以更好地反映火灾传播的复杂特征。
+
+将 `humidity`（湿度）纳入火势传播概率的计算中，可以通过引入湿度因子的影响来调整传播概率。例如，湿度越高，火势传播的概率越低。因此，我们可以添加一个基于湿度的衰减因子。以下是修改后的代码以及公式和文档说明。
+
+##
+
+
+在本研究中，我们提出了一种综合考虑多种环境因子的火势传播概率模型，以更准确地模拟火灾在二维网格中的传播行为。火势传播概率 \(P\) 的计算公式为：
+
+In this study, we propose a fire spread probability model that comprehensively considers multiple environmental factors to more accurately simulate the spread of fires in a two-dimensional grid. The formula for calculating the fire spread probability P is as follows:
+
+<!-- \[
+P = 0.8 \cdot D \cdot R \cdot (1 - e^{-0.25 \cdot W}) \cdot H
+\] -->
+
+$$
+P = 0.8 \cdot D \cdot R \cdot (1 - e^{-0.25 \cdot W}) \cdot H \tag{1}
+$$
+
+
+
+其中，\(P\) 表示火势从当前单元格向目标单元格传播的概率，其范围限制在 \([0, 1]\) 之间。传播概率受到以下因素的共同影响：\(D\)、\(R\)、\(W\) 和 \(H\)。风向因子 \(D\) 用于刻画风向对火势传播方向的引导作用，其计算公式为：
+
+Where P represents the probability of fire spreading from the current cell to the target cell, with a range limited to [0, 1]. The spread probability is influenced by the following factors: D, R, W, and H. The wind direction factor D is used to characterize the guiding effect of wind direction on the direction of fire spread, and its calculation formula is:
+
+
+$$
+D = \cos(\min(|\theta - \phi|, 2\pi - |\theta - \phi|)), \tag{2}
+$$
+
+
+其中 \(\theta\) 表示目标单元格的方向，\(\phi\) 表示风向对应的角度。通过计算当前单元格到目标单元格的方向角与风向角的夹角，结合余弦函数对结果进行归一化，模型能够体现风向对火势传播的促进或抑制作用。
+
+The wind direction factor D is calculated based on the angle between the target cell's direction and the wind direction. By normalizing the angle difference between the current cell's direction and the wind direction using the cosine function, the model can reflect the promoting or inhibiting effect of wind direction on fire spread.
+
+邻居阻力因子 \(R\) 表征了目标单元格对火势传播的阻力，具体取决于目标单元格的属性（例如植被类型或燃料密度），并由函数 \(\text{getSpreadResistance()}\) 动态获取。风速 \(W\) 则通过指数衰减模型 \(1 - e^{-0.25 \cdot W}\) 影响传播概率，这种设计能够有效地模拟风速较小时传播概率的缓慢增长，以及风速较大时传播概率的迅速上升。
+
+The neighbor resistance factor R represents the resistance of the target cell to fire spread and depends on the properties of the target cell (such as vegetation type or fuel density). It is dynamically obtained by the function getSpreadResistance(). The wind speed W affects the spread probability through an exponential decay model 1 - e^{-0.25 \cdot W}, which effectively simulates the slow increase in spread probability at low wind speeds and the rapid increase at high wind speeds.
+
+湿度因子 \(H\) 通过对湿度 \(h\) 的归一化处理模拟其对火势传播的抑制作用，其计算公式为：
+
+The humidity factor H simulates the inhibitory effect of humidity on fire spread through normalized processing of humidity h, with the formula:
+
+<!-- \[
+H = \max(0.1, 1 - \frac{h}{100}),
+\] -->
+
+$$
+H = \max(0.1, 1 - \frac{h}{100}), \tag{3}
+$$
+
+其中，\(h\) 的取值范围为 \(0 \leq h \leq 100\)。湿度越高，因子 \(H\) 越小，体现出湿度对火势传播的显著抑制效应。为了避免湿度过高时传播概率直接降为零，公式中设置了一个最小值 \(0.1\)，以保留微弱的传播可能性。
+
+Where h ranges from 0 to 100. The higher the humidity, the smaller the factor H, reflecting the significant inhibitory effect of humidity on fire spread. To prevent the spread probability from dropping to zero when the humidity is too high, a minimum value of 0.1 is set in the formula to retain a weak possibility of spread.
+
+该模型的实现通过模块化的代码结构得以完成，新增函数 `getHumidityFactor` 用于计算湿度因子 \(H\)，而核心函数 `calculateSpreadProbability` 则整合了上述因子，动态计算火势传播概率。此外，风向角度计算和邻居阻力的获取均以独立模块实现，从而保证了模型的灵活性和可扩展性。这一设计为进一步纳入温度、海拔等复杂环境因素提供了接口支持。模型的应用和验证表明，该公式在捕捉风速、湿度和邻居阻力等因素的综合作用时表现出良好的物理合理性和计算效率。
+
+The implementation of this model is achieved through a modular code structure, with the addition of the function getHumidityFactor to calculate the humidity factor H. The core function calculateSpreadProbability integrates the above factors to dynamically calculate the fire spread probability. In addition, the wind direction angle calculation and neighbor resistance retrieval are implemented as independent modules to ensure the flexibility and scalability of the model. This design provides interface support for further incorporating complex environmental factors such as temperature and altitude. The application and validation of the model demonstrate its good physical rationality and computational efficiency in capturing the combined effects of wind speed, humidity, and neighbor resistance.
+
+## Results
+
+我们将上文计算得出的研究区域气象因素概率统计数据与火灾传播模型相结合，综合考虑风向、风速、湿度、阻燃性等多种因素，模拟了火灾传播过程。在实验中，我们选择构造一个10x10的网格环境，设置初始火源位置并模拟火势的蔓延。通过多次模拟实验，我们观察到火势传播的动态过程，并分析了不同因素对火灾传播速度和范围的影响。
+
+We combined the meteorological probability statistics data of the study area calculated above with the fire spread model to simulate the fire spread process, considering multiple factors such as wind direction, wind speed, humidity, and resistance. In the experiment, we constructed a 10x10 grid environment, set the initial fire source position, and simulated the spread of the fire. Through multiple simulation experiments, we observed the dynamic process of fire spread and analyzed the effects of different factors on the speed and range of fire spread.
+
+我们通过统计每一时间步燃烧cell的数量来绘制火势发展曲线，以动态检测模拟火灾发展的过程。同时，我们还分析了不同风向、风速、湿度和阻燃性条件下的火灾传播特征，包括火势蔓延速度、火灾范围和燃烧强度等指标。通过对比实验结果，我们得出了不同因素对火灾传播的影响程度，为进一步的火灾预防和应急管理提供了科学依据。
+
+We plotted the fire development curve by counting the number of burning cells at each time step to dynamically monitor the process of simulated fire development. We also analyzed the characteristics of fire spread under different wind directions, wind speeds, humidity, and resistance conditions, including fire spread speed, fire range, and burning intensity. By comparing the experimental results, we determined the degree of influence of different factors on fire spread, providing a scientific basis for further fire prevention and emergency management.
+
+我们发现，在没有消防介入的情况下，由于构建的虚拟研究区域资源相对有限，火灾往往会在大致蔓延到85%的区域后后逐步熄灭，这与自然情况下火灾的传播规律相符，即火灾在没有外部干预的情况下会自行熄灭。火势蔓延曲线往往会有一个先攀升后下降的过程，这表明火灾的蔓延速度在初期较快，随着燃料的减少和阻燃因子的增加，火势逐渐减弱。火势蔓延曲线一般会存在峰状结构，某些情况下可能会出现多个波峰，这与火灾传播的复杂性和随机性有关。
+
+
+We found that in the absence of firefighting intervention, due to the relatively limited resources in the virtual study area, fires tend to gradually extinguish after spreading to approximately 85% of the area. This is consistent with the natural spread pattern of fires, which will self-extinguish without external intervention. The fire spread curve often has a process of rising and then falling, indicating that the fire spread speed is relatively fast in the early stage, and gradually weakens as the fuel decreases and the resistance factor increases. The fire spread curve generally has a peak structure, and in some cases, there may be multiple peaks, which are related to the complexity and randomness of fire spread. 
+
+![](./imgs/p10.png)
+Figures 16: Different Fire Spread Curves(Without Firefighter Intervention)
+
+但是也有一些特殊情况，火势会蔓延至95%以上的区域，此时它的火势曲线会存在多个波峰，也就是说，火势在快要熄灭时，由于缺少人为干预，又复燃了，这可能是由于风向和风速等因素的影响导致火势的不稳定性。
+
+However, in some special cases, the fire may spread to more than 95% of the area. At this time, its fire curve will have multiple peaks, that is, when the fire is about to extinguish, it will reignite due to the lack of human intervention. This may be due to the instability of the fire caused by factors such as wind direction and wind speed.
+
+![](./imgs/p11.png)
+Figures 17: Bad Fire Spread Snario (more than 95% of the area)
+
+当风向分布较为集中时（例如大部分都是东北方向的风），在这种有限空间的模拟条件下，有利于抑制火势的蔓延，火灾范围受到一定程度的限制，过火面接也会限制在60%左右。
+
+When the wind direction is relatively concentrated (e.g., most of the wind is from the northeast), under the limited space simulation conditions, it is conducive to suppressing the spread of the fire, and the range of the fire is limited to a certain extent, and the maximum fire area is also limited to about 60%.
+
+![](./imgs/p9.png)
+Figures 18: Good Fire Spread Snario (less than 60% of the area)
+
+而当风向分布较为分散时，火势蔓延的速度会加快，火灾范围也会急速扩大，在极端情况下，火势可能会蔓延到整个研究区域。这表明风向对火灾传播具有显著的影响，风向的变化会导致火势传播的不确定性增加，增加了火灾应对的难度。
+
+When the wind direction is more dispersed, the speed of fire spread will accelerate, and the range of the fire will rapidly expand. In extreme cases, the fire may spread to the entire study area. This indicates that wind direction has a significant impact on fire spread, and changes in wind direction will increase the uncertainty of fire spread, increasing the difficulty of firefighting.
+
+总而言之，在没有人为干预的情况下，单时间步内的最大过火面积往往会超过40%，多数情况下，火势会在蔓延到85%左右的区域后逐渐熄灭，这时大约时60-90个时间步，假设每个时间步是1小时，那么火灾会持续约2-3天。在这个过程中，火势的蔓延速度和范围受到风向、风速、湿度和阻燃性等因素的共同影响，这些因素的变化会导致火灾传播的不确定性增加，增加了火灾应对的难度。
+
+In summary, in the absence of human intervention, the maximum fire area in a single time step often exceeds 40%. In most cases, the fire will gradually extinguish after spreading to about 85% of the area, which is about 60-90 time steps. Assuming each time step is 1 hour, the fire will last for about 2-3 days. In this process, the speed and range of fire spread are jointly affected by factors such as wind direction, wind speed, humidity, and resistance. Changes in these factors will increase the uncertainty of fire spread, increasing the difficulty of firefighting.
+
+接下来我们引入消防员智能体进行干预，消防员智能体会根据当前的环境条件和资源限制制定行动策略，包括扑灭火灾、设置隔离带和移动到火源位置等。同时，指定消防员智能体选择与当前盛行风向垂直的方向进行移动，以最大程度地抑制火势的蔓延。消防员在耗尽自身体力或水量后会停止行动，这样可以保证消防员的行动策略更加智能化和现实化。
+
+![](./imgs/p12.png)
+Figures 19: Fire Spread Scenario with Firefighter Intervention
+
+Next, we introduce firefighter agents for intervention. The firefighter agents will formulate action strategies based on the current environmental conditions and resource constraints, including extinguishing fires, setting firebreaks, and moving to fire source locations. At the same time, the firefighter agents are directed to move in a direction perpendicular to the prevailing wind direction to maximize the suppression of fire spread. Firefighters will stop moving after exhausting their stamina or water, ensuring that the firefighter's action strategy is more intelligent and realistic.
+
+而在引入消防员进行灭火干预后，火灾的蔓延速度明显减缓，火灾范围受到有效控制，多数情况下，最大过火面积会减少到原来的一半左右，而且火灾持续时间会有效缩短，同时火势蔓延曲线的波动也会减小，这表明消防员的干预对于控制火灾传播具有显著的效果，能够有效减少火灾造成的损失。
+
+After introducing firefighters for firefighting intervention, the fire spread speed significantly slows down, and the fire range is effectively controlled. In most cases, the maximum fire area will be reduced to about half of the original, and the duration of the fire will be effectively shortened. At the same time, the fluctuation of the fire spread curve will decrease. This indicates that firefighter intervention has a significant effect on controlling fire spread and can effectively reduce the losses caused by fires.
+
+![](./imgs/p14.png)
+Figures 20: Effect of Firefighter Intervention on Fire Spread

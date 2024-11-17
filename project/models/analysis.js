@@ -87,9 +87,12 @@ export class FireSpreadAnalysis {
     // 获取每个时间步中火势蔓延的格子数
     getSpreadAreaOverTime() {
         const spreadOverTime = {};
-        for (let time in this.timeEventMap) {
+
+        // 仅仅统计燃烧的格子数
+        Object.keys(this.timeEventMap).forEach(time => {
             spreadOverTime[time] = this.timeEventMap[time].length;
-        }
+        });
+
         return spreadOverTime;
     }
 

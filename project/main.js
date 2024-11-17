@@ -52,7 +52,11 @@ const windDirectionDist = new DiscreteDistribution({ 'N': 0.296650, 'E': 0.29094
 // Standard deviation of wind speed: 6.709404241331985
 const windSpeedDist = new GaussianDistribution(17.842082606166375, 6.709404241331985);  // real data
 
-const environment = new Environment(windDirectionDist, windSpeedDist);
+// | Mean Humidity | Standard Deviation of Humidity |
+// | 82.65597489758564 | 11.679318452222946 |
+const humidityDist = new GaussianDistribution(82.65597489758564, 11.679318452222946);
+
+const environment = new Environment(windDirectionDist, windSpeedDist, humidityDist);
 
 // 初始化 火势蔓延分析
 const analysis = new FireSpreadAnalysis(grid);
@@ -63,7 +67,7 @@ grid.addEvent(new FireSpreadEvent(0, grid, environment, Math.floor(gridSize / 2)
 
 // 创建消防员并添加到事件队列
 const firefighters = [];
-const numFirefighters = 20;
+const numFirefighters = 10;
 
 for (let i = 0; i < numFirefighters; i++) {
     const firefighter = new Firefighter(grid, gridSize - 1, gridSize - 1);
@@ -71,7 +75,7 @@ for (let i = 0; i < numFirefighters; i++) {
     grid.addEvent(new FirefighterEvent(0, firefighter));
 }
 
-const timeStep = 10; // 1 秒
+const timeStep = 10;
 
 renderer.addStrategy(new CellRenderer(renderer.canvas, gridSize));
 renderer.addStrategy(new WindRenderer(renderer.canvas, gridSize));
@@ -85,8 +89,6 @@ function renderLoop() {
     renderer.render(grid);
     requestAnimationFrame(renderLoop);  // Render at the browser's frame rate
 }
-
-
 
 function simuateLoop() {
     grid.step();
