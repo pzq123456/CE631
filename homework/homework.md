@@ -17,6 +17,8 @@ Figure 1: EzStrobe model of the precast concrete production line
 ### Results
 
 ## AnyLogic Model
+![](./imgs/p2.png)
+
 ### Model building
 
 ### Results
